@@ -1,0 +1,33 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+
+# unelte AI locale (skill-uri instalate pentru Claude / alți agenți)
+.claude/
+.agents/
+skills-lock.json
+
+# fișierele sursă din rădăcină — site-ul folosește copiile din public/
+/Zahariea_Cosmin_CV_Data.pdf
+/poza_profil.jpg

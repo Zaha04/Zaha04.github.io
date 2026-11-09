@@ -1,0 +1,90 @@
+---
+// „Imaginea” pentru Data Engineer / Integration: un pipeline animat
+const sources = [
+  { label: "SAP", y: 26 },
+  { label: "CRM", y: 70 },
+  { label: "APIs", y: 114 },
+];
+const bars = [14, 22, 30, 42, 56];
+---
+
+<figure class="role">
+  <div class="win" aria-hidden="true">
+    <div class="bar"><i></i><i></i><i></i><span>pipeline · daily_load</span></div>
+    <svg viewBox="0 0 300 140" class="pipe">
+      {sources.map((s, i) => (
+        <g>
+          <path id={`src-${i}`} class="flow" d={`M58 ${s.y} C 95 ${s.y}, 95 70, 128 70`} />
+          <rect class="box" x="8" y={s.y - 12} width="50" height="24" rx="6" />
+          <text class="t" x="33" y={s.y + 4}>{s.label}</text>
+          <circle class="pkt" r="3" style={`--y:${s.y}px;animation-duration:${1.8 + i * 0.35}s;animation-delay:${i * 0.4}s`} />
+        </g>
+      ))}
+
+      <path id="to-wh" class="flow" d="M188 70 L212 70" />
+      <rect class="box box--core" x="128" y="50" width="60" height="40" rx="8" />
+      <text class="t t--core" x="158" y="67">Airflow</text>
+      <text class="t t--core small" x="158" y="80">Spark · dbt</text>
+      <circle class="pkt pkt--core" r="3" />
+
+      <g class="wh">
+        <ellipse cx="236" cy="54" rx="22" ry="7" />
+        <path d="M214 54 V86 A22 7 0 0 0 258 86 V54" />
+        <ellipse cx="236" cy="70" rx="22" ry="7" class="mid" />
+      </g>
+      <text class="t" x="236" y="108">Warehouse</text>
+
+      <g class="chart">
+        {bars.map((h, i) => (
+          <rect class="b" x={268 + i * 6} y={60 - h / 2} width="4" height={h / 2} rx="1" style={`--i:${i}`} />
+        ))}
+      </g>
+    </svg>
+  </div>
+  <figcaption>
+    <strong>Data Engineer / Integration</strong>
+    <span>Python · PySpark · Airflow · dbt</span>
+  </figcaption>
+</figure>
+
+<style>
+  .role { margin: 0; }
+  .win {
+    border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: #fff;
+    box-shadow: 0 18px 40px -26px rgba(15, 23, 42, 0.45);
+  }
+  .bar { display: flex; align-items: center; gap: 4px; padding: 6px 8px; background: #f1f5f9; border-bottom: 1px solid var(--border); font-size: 10.5px; }
+  .bar i { width: 7px; height: 7px; border-radius: 50%; }
+  .bar i:first-child { background: #f87171; } .bar i:nth-child(2) { background: #fbbf24; } .bar i:nth-child(3) { background: #34d399; }
+  .bar span { margin-left: 6px; color: var(--muted); font-weight: 600; font-family: ui-monospace, Menlo, monospace; }
+  .pipe { display: block; width: 100%; height: auto; background: #f8fafc; }
+  .box { fill: #fff; stroke: #bfdbfe; stroke-width: 1.2; }
+  .box--core { fill: #2563eb; stroke: none; }
+  .t { font-size: 10px; font-weight: 600; fill: #1e3a8a; text-anchor: middle; }
+  .t--core { fill: #fff; }
+  .small { font-size: 8px; font-weight: 500; opacity: 0.9; }
+  .flow { fill: none; stroke: #bfdbfe; stroke-width: 1.5; stroke-dasharray: 3 3; }
+  /* pachetele merg de la sursă spre Airflow (curba aproximată din 3 puncte) */
+  .pkt { fill: #2563eb; animation: to-core linear infinite; }
+  @keyframes to-core {
+    0% { transform: translate(58px, var(--y)); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translate(93px, calc((var(--y) + 70px) / 2)); }
+    90% { opacity: 1; }
+    100% { transform: translate(126px, 70px); opacity: 0; }
+  }
+  .pkt--core { fill: #10b981; animation: to-wh 1.1s linear infinite; }
+  @keyframes to-wh { from { transform: translate(188px, 70px); } to { transform: translate(212px, 70px); } }
+  .wh ellipse, .wh path { fill: #ecfdf5; stroke: #10b981; stroke-width: 1.3; }
+  .wh .mid { fill: none; }
+  .b { fill: #10b981; transform-box: fill-box; transform-origin: bottom; animation: grow 3s ease-in-out infinite; animation-delay: calc(var(--i) * 0.15s); }
+  @keyframes grow { 0%, 100% { transform: scaleY(0.55); } 50% { transform: scaleY(1); } }
+
+  figcaption { display: flex; flex-direction: column; margin-top: 0.6rem; }
+  figcaption strong { font-size: 1rem; }
+  figcaption span { color: var(--muted); font-size: 0.82rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .b { animation: none; } .pkt { display: none; }
+  }
+</style>

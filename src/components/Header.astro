@@ -1,0 +1,42 @@
+---
+import { profile, navItems } from "../data/cv";
+---
+
+<header>
+  <nav class="container">
+    <a href="#" class="brand">{profile.name}</a>
+    <ul>
+      {navItems.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  header {
+    min-height: var(--header-h);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+  }
+  .brand { font-weight: 700; color: var(--text); }
+  @media (max-width: 640px) {
+    header { position: static; }
+    nav { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+    ul { gap: 1rem; }
+    ul a { font-size: 0.9rem; }
+  }
+  ul { display: flex; flex-wrap: wrap; gap: 1.25rem; list-style: none; margin: 0; padding: 0; }
+  ul a { color: var(--muted); font-size: 0.95rem; }
+  ul a:hover { color: var(--text); text-decoration: none; }
+</style>

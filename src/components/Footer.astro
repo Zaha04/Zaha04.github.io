@@ -1,0 +1,21 @@
+---
+import { profile } from "../data/cv";
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="container">
+    <span>© {year} {profile.name}</span>
+    <span class="sep" aria-hidden="true">·</span>
+    <span>🍪 No cookies, no tracking</span>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="/privacy/">Privacy notice</a>
+  </div>
+</footer>
+
+<style>
+  footer { padding: 2rem 0; color: var(--muted); font-size: 0.9rem; text-align: center; }
+  .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 0.6rem; }
+  a { color: var(--muted); text-decoration: underline; }
+  a:hover { color: var(--text); }
+</style>

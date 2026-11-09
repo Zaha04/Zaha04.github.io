@@ -1,0 +1,117 @@
+---
+import { topSkills, timeline, profile } from "../data/cv";
+
+// De câte ori apare fiecare tehnologie în „Cast my story”
+const usedIn = (name: string) =>
+  timeline.filter((e) => (e.tags ?? []).some((t) => t.toLowerCase() === name.toLowerCase())).length;
+---
+
+<section id="skills" class="skills">
+  <div class="container">
+    <p class="eyebrow">Top skills</p>
+    <h2>The bait I use most</h2>
+    <p class="lead">My five go-to tools. Click one to see every stop in the story where I used it.</p>
+
+    <ol class="grid">
+      {topSkills.map((s, i) => {
+        const n = usedIn(s.name);
+        return (
+          <li style={`--i:${i}`}>
+            <button type="button" class="skill" data-skill={s.name.toLowerCase()} data-skill-label={s.name}>
+              <span class="rank" aria-hidden="true">#{i + 1}</span>
+              <strong class="name">{s.name}</strong>
+              <span class="note">{s.note}</span>
+              <span class="level" role="img" aria-label={`Level ${s.level} of 5`}>
+                {Array.from({ length: 5 }, (_, k) => <span class:list={["seg", { on: k < s.level }]} />)}
+              </span>
+              <span class="used">🎣 Used in {n} {n === 1 ? "stop" : "stops"} ↗</span>
+            </button>
+          </li>
+        );
+      })}
+    </ol>
+
+    <!-- Peștele cel mare: descarcă CV-ul -->
+    <div class="big-one">
+      <svg class="big-fish-art" viewBox="0 0 80 50" width="72" height="45" aria-hidden="true">
+        <defs><linearGradient id="bigfishg" x1="0" x2="1"><stop offset="0" stop-color="#38bdf8" /><stop offset="1" stop-color="#2563eb" /></linearGradient></defs>
+        <path d="M58 25 L78 8 L74 25 L78 42 Z" fill="#f59e0b" />
+        <path d="M28 9 Q40 -1 50 10" fill="#f59e0b" />
+        <ellipse cx="34" cy="25" rx="30" ry="17" fill="url(#bigfishg)" />
+        <circle cx="15" cy="20" r="4.2" fill="#fff" /><circle cx="14" cy="20" r="2.1" fill="#0f172a" />
+        <path d="M5 28 q4 2.5 8 0" stroke="#0f172a" stroke-width="1.6" fill="none" stroke-linecap="round" />
+      </svg>
+      <div class="big-text">
+        <strong>Want the full picture?</strong>
+        <span>Every role, project and certification — in one PDF.</span>
+      </div>
+      <a class="btn primary big-btn" href={profile.cv} download>🎣 Catch the big one — download my CV</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .eyebrow { margin: 0; color: var(--accent); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  h2 { margin: 0.3rem 0 0.5rem; }
+
+  /* mobil: o coloană; tabletă: 2; desktop: toate 5 pe un rând */
+  .grid { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; gap: 0.9rem; grid-template-columns: 1fr; }
+  @media (min-width: 560px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+
+  .skill {
+    width: 100%; height: 100%; text-align: left; cursor: pointer;
+    display: flex; flex-direction: column; gap: 0.45rem;
+    padding: 1.1rem 1.15rem; border-radius: 16px;
+    background: #fff; border: 1px solid var(--border);
+    box-shadow: 0 14px 30px -24px rgba(15, 23, 42, 0.4);
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+  .skill:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); box-shadow: 0 20px 36px -22px rgba(37, 99, 235, 0.45); }
+  .rank { font-size: 0.75rem; font-weight: 700; color: var(--muted); }
+  .name { font-size: 1.15rem; }
+  .note { font-size: 0.85rem; color: var(--muted); flex: 1; }
+  .level { display: flex; gap: 4px; margin-top: 0.2rem; }
+  .seg { flex: 1; height: 6px; border-radius: 3px; background: var(--border); }
+  .seg.on { background: linear-gradient(90deg, var(--accent), #0ea5e9); }
+  .used { font-size: 0.78rem; font-weight: 600; color: var(--accent); }
+
+  .skill.is-active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .skill.is-active .note, .skill.is-active .rank, .skill.is-active .used { color: rgba(255, 255, 255, 0.85); }
+  .skill.is-active .seg { background: rgba(255, 255, 255, 0.3); }
+  .skill.is-active .seg.on { background: #fff; }
+
+  /* ---- Peștele cel mare (CV) ---- */
+  .big-one {
+    margin-top: 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem;
+    padding: 1.1rem 1.4rem; border-radius: 18px;
+    background: linear-gradient(135deg, #eff6ff, #e0f2fe); border: 1px solid #bfdbfe;
+  }
+  .big-fish-art { flex-shrink: 0; animation: big-wiggle 1.6s ease-in-out infinite; transform-origin: 30% 50%; }
+  @keyframes big-wiggle { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg) translateY(-2px); } }
+  .big-text { display: flex; flex-direction: column; flex: 1; min-width: 14rem; }
+  .big-text span { color: var(--muted); font-size: 0.9rem; }
+  .big-btn { animation: tug 2.6s ease-in-out 1s infinite; }
+  .big-btn:hover { animation: none; }
+  @keyframes tug { 0%, 86%, 100% { transform: none; } 90% { transform: rotate(-2deg) translateY(-2px); } 95% { transform: rotate(2deg); } }
+  @media (max-width: 559px) { .big-btn { width: 100%; justify-content: center; } }
+  @media (prefers-reduced-motion: reduce) { .big-fish-art, .big-btn { animation: none; } }
+
+  /* apar pe rând, de la stânga la dreapta */
+  :global(.js) .skills:not(.in) li { opacity: 0; transform: translateY(16px); }
+  .grid li { transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: calc(var(--i) * 0.08s); }
+  @media (prefers-reduced-motion: reduce) { .grid li { transition: none; } }
+</style>
+
+<script>
+  const sk = document.querySelector<HTMLElement>(".skills");
+  if (sk) {
+    if (!("IntersectionObserver" in window)) sk.classList.add("in");
+    else {
+      const io = new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) { sk.classList.add("in"); io.disconnect(); }
+      }, { threshold: 0.25 });
+      io.observe(sk);
+    }
+  }
+</script>

@@ -1,0 +1,838 @@
+---
+import { timeline, typeLabels, profile } from "../data/cv";
+
+// Ordine cronologică: de la primul rol (IFS / ERP) până azi
+const entries = [...timeline].sort((a, b) => a.start.localeCompare(b.start));
+const total = entries.length;
+
+// Pești care înoată prin apă (fug când treci cu mouse-ul pe lângă ei)
+const swimmers = [
+  { y: 26, d: 26, delay: 3, s: 1, rev: false, c: "#60a5fa" },
+  { y: 33, d: 34, delay: 14, s: 0.8, rev: true, c: "#38bdf8" },
+  { y: 52, d: 29, delay: 8, s: 1.2, rev: false, c: "#3b82f6" },
+  { y: 68, d: 38, delay: 20, s: 0.9, rev: true, c: "#0ea5e9" },
+  { y: 84, d: 31, delay: 5, s: 1.1, rev: false, c: "#2563eb" },
+];
+
+// Bule care urcă prin „apă” (poziții fixe, ca pagina să fie identică la fiecare încărcare)
+const bubbles = [
+  { x: 6, y: 5, s: 8, d: 14, delay: 0 }, { x: 18, y: 30, s: 5, d: 18, delay: 4 }, { x: 31, y: 55, s: 10, d: 16, delay: 9 },
+  { x: 44, y: 15, s: 6, d: 20, delay: 2 }, { x: 58, y: 70, s: 9, d: 15, delay: 7 }, { x: 69, y: 40, s: 5, d: 19, delay: 11 },
+  { x: 81, y: 85, s: 8, d: 17, delay: 5 }, { x: 93, y: 20, s: 6, d: 21, delay: 1 },
+];
+---
+
+<section id="journey" class="journey" data-journey>
+  <div class="container wide">
+    <h2>Cast my story</h2>
+    <p class="lead">
+      Cast the line and follow it down, one stop at a time — from IFS ERP technical consulting to data engineering. Something's waiting at the bottom.
+    </p>
+
+    <!-- HUD: progresul jocului (apare doar cu JS) -->
+    <div class="hud" data-hud hidden>
+      <span class="hud-label">Stop <strong data-hud-n>1</strong> of {total}</span>
+      <div class="hud-dots" aria-hidden="true">
+        {entries.map(() => <span class="hud-dot"></span>)}
+        <span class="hud-dot hud-dot--flag">🐟</span>
+      </div>
+      <span class="hud-miss" data-hud-miss hidden>🐟💨 missed ×<strong data-hud-miss-n>0</strong></span>
+      <button type="button" class="text-btn" data-show-all>Show all</button>
+    </div>
+
+    <div class="skill-status" data-skill-status hidden aria-live="polite">
+      <span>Highlighting <strong data-skill-name></strong> — <span data-skill-count></span></span>
+      <button type="button" class="text-btn" data-clear-skill>Clear ✕</button>
+    </div>
+
+    <div class="track" data-track>
+      <div class="water" aria-hidden="true">
+        {bubbles.map((b) => (
+          <span class="bubble" style={`left:${b.x}%;bottom:${b.y}%;width:${b.s}px;height:${b.s}px;animation-duration:${b.d}s;animation-delay:-${b.delay}s`}></span>
+        ))}
+        {swimmers.map((f) => (
+          <span class:list={["swimmer", { rev: f.rev }]} style={`top:${f.y}%;animation-duration:${f.d}s;animation-delay:-${f.delay}s;--s:${f.s};color:${f.c}`} data-swimmer>
+            <svg viewBox="0 0 44 24" width="44" height="24">
+              <path d="M30 12 L43 3 L40 12 L43 21 Z" fill="currentColor" opacity="0.8" />
+              <ellipse cx="18" cy="12" rx="16" ry="9" fill="currentColor" />
+              <circle cx="9" cy="10" r="2" fill="#fff" />
+            </svg>
+          </span>
+        ))}
+      </div>
+      <div class="line" aria-hidden="true"></div>
+      <div class="line-fill" data-line-fill aria-hidden="true"></div>
+      <div class="runner-lane" data-runner-lane aria-hidden="true"><span class="runner">
+        <svg class="lure" viewBox="0 0 24 40" width="22" height="38">
+          <path d="M12 0 V9" stroke="#334155" stroke-width="1.4" />
+          <circle cx="12" cy="11" r="2.4" fill="none" stroke="#64748b" stroke-width="1.6" />
+          <path d="M12 13.5 V30 A6 6 0 0 1 0.8 30 V25" fill="none" stroke="#64748b" stroke-width="2.2" stroke-linecap="round" />
+          <path d="M0.8 25 l3 3" stroke="#64748b" stroke-width="2" stroke-linecap="round" />
+          <path d="M12 15 q6 3 0 6 q-6 3 0 6 q5 2 1 5" fill="none" stroke="#f472b6" stroke-width="4" stroke-linecap="round" />
+        </svg>
+      </span></div>
+
+      <div class="endpoint">
+        <!-- Suprafața apei, cu valuri care se mișcă -->
+        <div class="surface" aria-hidden="true"></div>
+        <!-- Pescarul în barcă: firul pleacă din vârful undiței lui; click pe el = aruncă -->
+        <button type="button" class="boat-btn" data-boat aria-label="Cast the line">
+          <svg class="boat" viewBox="0 0 260 150" width="260" height="150" aria-hidden="true">
+            <g class="boat-bob">
+              <!-- barca -->
+              <rect x="14" y="98" width="222" height="8" rx="4" fill="#92400e" />
+              <path d="M18 104 H232 L208 136 Q125 146 42 136 Z" fill="#b45309" />
+              <path d="M26 114 H224" stroke="#fde68a" stroke-width="4" />
+              <!-- pescarul -->
+              <g class="fisher">
+                <rect x="98" y="62" width="34" height="40" rx="10" fill="#2563eb" />
+                <rect x="98" y="72" width="34" height="8" fill="#f59e0b" />
+                <circle cx="115" cy="48" r="13" fill="#f5c9a0" />
+                <circle cx="121" cy="46" r="1.7" fill="#0f172a" />
+                <path d="M117 54 q4 3 8 0" stroke="#0f172a" stroke-width="1.6" fill="none" stroke-linecap="round" class="mouth" />
+                <path d="M100 42 Q115 25 130 42 Z" fill="#065f46" />
+                <rect x="95" y="40" width="40" height="5" rx="2.5" fill="#065f46" />
+              </g>
+              <!-- brațul + undița (se mișcă la aruncare) -->
+              <g class="rod-g">
+                <path d="M126 74 L146 84" stroke="#2563eb" stroke-width="8" stroke-linecap="round" />
+                <path d="M140 94 Q200 42 240 16" stroke="#92400e" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <circle cx="152" cy="86" r="5.5" fill="#cbd5e1" stroke="#475569" stroke-width="1.5" />
+                <line x1="152" y1="86" x2="156" y2="81" stroke="#475569" stroke-width="2" stroke-linecap="round" class="reel-handle" />
+                <circle cx="147" cy="84" r="4.5" fill="#f5c9a0" />
+              </g>
+            </g>
+          </svg>
+        </button>
+        <div class="say" data-say aria-live="polite">Click me to cast! 🎣</div>
+        <span class="endpoint-dot" aria-hidden="true"></span>
+        <span class="endpoint-label">🎣 Cast off · {entries[0]?.start.slice(0, 4)}</span>
+      </div>
+
+      <ol class="entries">
+        {entries.map((e, i) => (
+          <li
+            class:list={["entry", i % 2 === 0 ? "is-left" : "is-right"]}
+            data-entry
+            data-type={e.type}
+            data-year={e.start.slice(0, 4)}
+            data-tags={(e.tags ?? []).map((t) => t.toLowerCase()).join("|")}
+          >
+            <span class={`marker marker--${e.type}`} aria-hidden="true"></span>
+            <span class="side-year" aria-hidden="true">{e.period}</span>
+            <span class="miss" aria-hidden="true">
+              <span class="miss-fish-wrap">
+                <svg class="miss-fish" viewBox="0 0 44 24" width="34" height="19">
+                  <path d="M30 12 L43 3 L40 12 L43 21 Z" fill="currentColor" opacity="0.8" />
+                  <ellipse cx="18" cy="12" rx="16" ry="9" fill="currentColor" />
+                  <circle cx="9" cy="10" r="2" fill="#fff" />
+                </svg>
+              </span>
+              <span class="miss-tag">Missed the fish! 💨</span>
+            </span>
+            <article class="card">
+              <div class="card-head">
+                {e.logo ? (
+                  <img class="logo" src={e.logo} alt={e.logoAlt ?? e.org} width="44" height="44" loading="lazy" />
+                ) : e.monogram ? (
+                  <span class="logo monogram" aria-hidden="true">{e.monogram}</span>
+                ) : null}
+                <div class="head-text">
+                  <span class={`badge badge--${e.type}`}>{typeLabels[e.type]}</span>
+                  <span class="period">{e.period}</span>
+                </div>
+              </div>
+              <h3>{e.title}</h3>
+              {e.subtitle && <p class="subtitle">{e.subtitle}</p>}
+              <p class="org">{e.org}</p>
+              {e.slogan && <blockquote class="slogan">“{e.slogan}”</blockquote>}
+              <p class="summary">{e.summary}</p>
+
+              {e.tags && (
+                <ul class="tags" aria-label="Technologies">
+                  {e.tags.map((t) => (
+                    <li>
+                      <button type="button" class="tag" data-skill={t.toLowerCase()} data-skill-label={t}>{t}</button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {e.highlights && (
+                <details>
+                  <summary>What I did <span class="n">({e.highlights.length})</span></summary>
+                  <ul class="highlights">
+                    {e.highlights.map((h) => <li>{h}</li>)}
+                  </ul>
+                </details>
+              )}
+            </article>
+          </li>
+        ))}
+      </ol>
+
+      <!-- Butonul de avansare, pe linie (apare doar cu JS) -->
+      <div class="next-stop" data-next-wrap hidden>
+        <button type="button" class="next-btn" data-next>
+          <span class="next-ring" aria-hidden="true"><span class="next-icon">🎣</span></span>
+          <span class="next-text">
+            <strong data-next-title>Continue</strong>
+            <span data-next-sub></span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Destinația -->
+      <div class="finale" data-finale>
+        <span class="finale-dot" aria-hidden="true"></span>
+        <svg class="fish" viewBox="0 0 80 50" width="80" height="50" aria-hidden="true">
+          <defs>
+            <linearGradient id="fishg" x1="0" x2="1"><stop offset="0" stop-color="#38bdf8" /><stop offset="1" stop-color="#2563eb" /></linearGradient>
+          </defs>
+          <path d="M58 25 L78 8 L74 25 L78 42 Z" fill="#f59e0b" />
+          <path d="M28 9 Q40 -1 50 10" fill="#f59e0b" />
+          <ellipse cx="34" cy="25" rx="30" ry="17" fill="url(#fishg)" />
+          <path d="M27 13 q-5 12 0 24" stroke="rgba(255,255,255,0.55)" stroke-width="2" fill="none" />
+          <circle cx="15" cy="20" r="4.2" fill="#fff" /><circle cx="14" cy="20" r="2.1" fill="#0f172a" />
+          <path d="M5 28 q4 2.5 8 0" stroke="#0f172a" stroke-width="1.6" fill="none" stroke-linecap="round" />
+        </svg>
+        <div class="finale-card">
+          <div class="confetti" data-confetti aria-hidden="true"></div>
+          <span class="finale-label">Fish on! 🎣</span>
+          <h3>You reeled it all the way to today.</h3>
+          <p>
+            {profile.currentRole} at {profile.currentCompany} — automating SAP reporting and building data tools people use every day.
+            The next stop on this path could be <strong>your team</strong> — {`I'm open to roles as ${profile.openTo.slice(0, -1).join(", ")} or ${profile.openTo[profile.openTo.length - 1]}.`}
+          </p>
+          <div class="finale-actions">
+            <a class="btn primary" href="#contact" data-mail data-u={profile.emailUser} data-d={profile.emailDomain}>Reel me in — let's talk</a>
+            <a class="btn" href={profile.linkedin} target="_blank" rel="noopener">LinkedIn ↗</a>
+            <button type="button" class="btn ghost" data-replay hidden>Replay ↺</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Pe telefon: linia în stânga. Pe desktop: linia pe mijloc, carduri stânga/dreapta */
+  .journey { --line-x: 1.25rem; --gap: 3.5rem; }
+
+  /* ---- HUD ---- */
+  .hud {
+    position: sticky; top: calc(var(--header-h) + 0.75rem); z-index: 6;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    width: fit-content; margin: 1.5rem auto 1.5rem;
+    background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border); border-radius: 999px; padding: 0.5rem 1.1rem;
+    box-shadow: 0 10px 30px -18px rgba(15, 23, 42, 0.4);
+    font-size: 0.9rem;
+  }
+  .hud[hidden] { display: none; }
+  .hud-label strong { font-variant-numeric: tabular-nums; }
+  .hud-dots { display: flex; gap: 0.35rem; align-items: center; }
+  .hud-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background 0.4s, transform 0.4s; }
+  :global(.hud-dot.done) { background: var(--accent); }
+  :global(.hud-dot.current) { transform: scale(1.35); }
+  .hud-dot--flag { width: auto; height: auto; background: none; font-size: 0.9rem; filter: grayscale(1); opacity: 0.5; }
+  :global(.hud-dot--flag.done) { filter: none; opacity: 1; background: none; }
+  .text-btn { background: none; border: none; cursor: pointer; color: var(--accent); font-size: 0.85rem; padding: 0; }
+  .text-btn:hover { text-decoration: underline; }
+  .text-btn[hidden] { display: none; }
+
+  .skill-status {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem;
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); padding: 0.6rem 1rem; margin-bottom: 1rem;
+    position: sticky; top: calc(var(--header-h) + 4rem); z-index: 5;
+  }
+  .skill-status[hidden] { display: none; }
+
+  /* ---- Pe toată lățimea ecranului ---- */
+  .wide { max-width: none; padding: 0 clamp(1rem, 4vw, 3.5rem); }
+  .wide > h2, .wide > .lead { max-width: var(--max-width); margin-left: auto; margin-right: auto; }
+  .card { max-width: 600px; }
+
+  /* ---- Peștii din apă ---- */
+  .swimmer {
+    position: absolute; left: 0; pointer-events: auto; cursor: pointer;
+    animation: swim linear infinite; opacity: 0.35;
+  }
+  .swimmer svg { display: block; transform: scale(var(--s)); transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+  .swimmer.rev { animation-name: swim-rev; }
+  .swimmer:not(.rev) svg { transform: scale(var(--s)) scaleX(-1); }
+  @keyframes swim { from { transform: translateX(-60px); } to { transform: translateX(calc(100vw + 60px)); } }
+  @keyframes swim-rev { from { transform: translateX(calc(100vw + 60px)); } to { transform: translateX(-60px); } }
+  :global(.swimmer.scared) svg { transform: translate(0, -60px) scale(calc(var(--s) * 1.3)) rotate(-25deg) !important; }
+  :global(.swimmer.scared) { opacity: 0.7; }
+
+  /* ---- Linia ---- */
+  .track {
+    position: relative; padding-top: 0.5rem; border-radius: 28px;
+    /* apa: din ce în ce mai adâncă (mai albastră) spre final */
+    background: linear-gradient(to bottom, transparent 0, transparent 176px, #e0f2fe 176px, #dbeafe 100%);
+  }
+  .water { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; }
+  .bubble {
+    position: absolute; border-radius: 50%;
+    border: 1.5px solid rgba(37, 99, 235, 0.35); background: rgba(255, 255, 255, 0.5);
+    animation: bubble-rise linear infinite;
+  }
+  @keyframes bubble-rise {
+    0% { opacity: 0; transform: translate(0, 0); }
+    10% { opacity: 0.8; }
+    50% { transform: translate(10px, -240px); }
+    85% { opacity: 0.6; }
+    100% { opacity: 0; transform: translate(-6px, -480px); }
+  }
+  .line, .line-fill, .runner-lane { position: absolute; top: 0; left: var(--line-x); transform: translateX(-50%); }
+  .line { bottom: 0; width: 4px; border-radius: 4px; background: repeating-linear-gradient(to bottom, var(--border) 0 8px, transparent 8px 14px); }
+  /* firul de pescuit */
+  .line-fill {
+    width: 2px; height: 0; border-radius: 2px;
+    background: #334155;
+    transition: height 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .runner-lane { width: 0; height: 0; transition: height 0.9s cubic-bezier(0.65, 0, 0.35, 1); }
+  /* momeala care cade încontinuu pe fir */
+  .runner {
+    position: absolute; left: 0; top: 0;
+    transform: translate(-50%, -4px);
+    animation: run 4.5s cubic-bezier(0.45, 0, 0.75, 1) infinite;
+    z-index: 3;
+  }
+  .lure { display: block; transform-origin: 50% 0; animation: sway 1.4s ease-in-out infinite; filter: drop-shadow(0 2px 2px rgba(15, 23, 42, 0.2)); }
+  @keyframes sway { 0%, 100% { transform: rotate(-9deg); } 50% { transform: rotate(9deg); } }
+  /* --h = lungimea firului, setată din JS */
+  @keyframes run {
+    0% { transform: translate(-50%, -4px); opacity: 0; }
+    6% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translate(-50%, calc(var(--h, 0px) - 4px)); opacity: 0; }
+  }
+
+  /* ---- Start ---- */
+  .endpoint { position: relative; padding: 12.5rem 0 2rem var(--gap); color: var(--muted); font-weight: 600; font-size: 0.9rem; }
+  /* vârful undiței = de aici pleacă firul */
+  .endpoint-dot {
+    position: absolute; left: var(--line-x); top: 3.75rem; z-index: 3;
+    width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%);
+    background: #334155;
+  }
+  /* barca: vârful undiței (240,16 în SVG) stă exact pe punctul de start al firului.
+     Pe telefon (fir în stânga) barca e oglindită ca să încapă pe ecran. */
+  .boat-btn {
+    position: absolute; top: calc(3.75rem - 16px); left: calc(var(--line-x) - 240px);
+    width: 260px; height: 150px; padding: 0; border: none; background: none; cursor: pointer;
+    transform: scaleX(-1); transform-origin: 240px 16px; z-index: 2;
+  }
+  .boat { display: block; overflow: visible; }
+  .boat-btn:hover .fisher { transform: translateY(-2px); }
+  .boat-btn:focus-visible { outline-offset: -10px; border-radius: 20px; }
+  .fisher { transition: transform 0.2s; }
+  .boat-bob { transform-origin: 125px 120px; animation: boat-bob 3.2s ease-in-out infinite; }
+  @keyframes boat-bob { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(3px) rotate(1.5deg); } }
+  :global(.track.excited) .boat-bob { animation: boat-jump 0.5s ease-out 3; }
+  @keyframes boat-jump { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-14px) rotate(-3deg); } }
+  .rod-g { transform-origin: 147px 84px; transition: transform 0.25s; }
+
+  .surface { position: absolute; left: 0; right: 0; top: calc(3.75rem - 16px + 120px); height: 16px; overflow: hidden; z-index: 1; pointer-events: none; }
+  .surface::before {
+    content: ""; position: absolute; top: 0; left: 0; height: 100%; width: calc(100% + 80px);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 16'%3E%3Cpath d='M0 8 Q20 0 40 8 T80 8 V16 H0 Z' fill='%23bfdbfe'/%3E%3C/svg%3E") repeat-x;
+    background-size: 80px 16px; animation: waves 3s linear infinite;
+  }
+  @keyframes waves { to { transform: translateX(-80px); } }
+
+  /* bula de dialog a pescarului */
+  .say {
+    position: absolute; top: 0.25rem; left: calc(var(--line-x) + 125px); z-index: 4;
+    transform: translateX(-50%); max-width: 15rem; width: max-content;
+    padding: 0.45rem 0.8rem; border-radius: 14px; background: #fff; border: 1px solid var(--border);
+    box-shadow: 0 10px 24px -14px rgba(15, 23, 42, 0.45);
+    font-size: 0.85rem; font-weight: 600; color: var(--text); text-align: center;
+  }
+  .say::after {
+    content: ""; position: absolute; left: 50%; bottom: -6px; width: 10px; height: 10px; margin-left: -5px;
+    background: #fff; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg);
+  }
+  :global(.say.pop) { animation: say-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes say-pop { from { transform: translateX(-50%) scale(0.7); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+  /* aruncarea: undița se smucește înainte */
+  :global(.track.casting) .rod-g { animation: cast 0.55s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes cast { 0% { transform: rotate(-14deg); } 45% { transform: rotate(10deg); } 100% { transform: rotate(0); } }
+  :global(.track.casting) .reel-handle { animation: spin 0.55s linear; transform-origin: 152px 86px; }
+  @keyframes spin { to { transform: rotate(720deg); } }
+
+  /* ---- Opriri ---- */
+  .entries { list-style: none; margin: 0; padding: 0; }
+  .entry { position: relative; padding: 0 0 2rem var(--gap); }
+  :global(.entry.is-locked) { display: none; }
+
+  .marker {
+    position: absolute; left: var(--line-x); top: 1.6rem;
+    width: 1.1rem; height: 1.1rem; border-radius: 50%; transform: translateX(-50%) scale(0.4);
+    background: var(--bg); border: 3px solid var(--border); opacity: 0;
+    transition: border-color 0.3s, background 0.3s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+    z-index: 2;
+  }
+  :global(.entry.is-reached) .marker { opacity: 1; transform: translateX(-50%) scale(1); box-shadow: 0 0 0 5px var(--bg); }
+  :global(.entry.is-reached) .marker--work { border-color: var(--work); background: var(--work); }
+  :global(.entry.is-reached) .marker--certification { border-color: var(--certification); background: var(--certification); }
+  :global(html:not(.js)) .marker { opacity: 1; transform: translateX(-50%); }
+
+  .side-year { display: none; }
+
+  /* ---- „Missed the fish” ---- */
+  .miss { display: flex; align-items: center; gap: 0.4rem; margin: 0 0 0.5rem; font-size: 0.8rem; font-weight: 700; color: #b45309; opacity: 0; }
+  :global(html:not(.js)) .miss { display: none; }
+  :global(.entry.is-reached) .miss { opacity: 1; }
+  .miss-fish-wrap { display: inline-flex; }
+  .miss-fish { color: #60a5fa; opacity: 0; }
+  /* peștele vine la cârlig, ciugulește de două ori, apoi fuge */
+  :global(.entry.is-reached) .miss-fish { animation: nibble-flee 1.7s cubic-bezier(0.3, 0, 0.3, 1) 0.15s both; }
+  @keyframes nibble-flee {
+    0% { transform: translateX(40px); opacity: 0; }
+    28% { transform: translateX(0); opacity: 1; }
+    36% { transform: translateX(5px); }
+    44% { transform: translateX(0); }
+    52% { transform: translateX(5px); }
+    58% { transform: translateX(0) scaleX(-1); opacity: 1; }
+    100% { transform: translateX(80px) translateY(-8px) scaleX(-1); opacity: 0; }
+  }
+  .miss-tag { padding: 0.15rem 0.55rem; border-radius: 999px; background: #fffbeb; border: 1px solid #fde68a; white-space: nowrap; }
+  :global(.entry.is-reached) .miss-tag { animation: tag-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 1.15s both; }
+  @keyframes tag-pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+
+  .hud-miss { color: #b45309; font-weight: 600; font-size: 0.85rem; }
+  @media (max-width: 640px) {
+    .hud { gap: 0.6rem; padding: 0.4rem 0.8rem; font-size: 0.8rem; flex-wrap: nowrap; }
+    .hud-dots { gap: 0.25rem; }
+    .hud-dot { width: 8px; height: 8px; }
+    .hud-miss { font-size: 0.75rem; }
+  }
+  .hud-miss[hidden] { display: none; }
+
+  .card {
+    position: relative;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.15rem 1.3rem;
+    box-shadow: 0 14px 34px -24px rgba(15, 23, 42, 0.35);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s, border-color 0.2s;
+  }
+  :global(.js) .entry:not(.is-visible) .card { opacity: 0; transform: translateX(40px); }
+  :global(.js) .entry:not(.is-visible) .side-year { opacity: 0; }
+
+  /* ---- Butonul „Continue” ---- */
+  .next-stop { position: relative; padding: 0.5rem 0 2rem var(--gap); }
+  .next-stop[hidden] { display: none; }
+  .next-btn {
+    display: inline-flex; align-items: center; gap: 0.9rem;
+    background: none; border: none; padding: 0; cursor: pointer; text-align: left;
+  }
+  .next-ring {
+    position: absolute; left: var(--line-x); top: 0.5rem; transform: translateX(-50%);
+    width: 3.4rem; height: 3.4rem; border-radius: 50%;
+    display: grid; place-items: center; font-size: 1.4rem; font-weight: 700; color: #fff;
+    background: var(--accent); touch-action: none; user-select: none; -webkit-user-select: none;
+    box-shadow: 0 0 0 6px var(--bg), 0 10px 24px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+    transition: transform 0.2s;
+  }
+  .next-ring::before {
+    content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: -1;
+    background: color-mix(in srgb, var(--accent) 45%, transparent);
+    animation: beckon 1.8s ease-out infinite;
+  }
+  .next-btn:hover .next-ring { transform: translateX(-50%) scale(1.08); }
+  .next-btn { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+  .next-icon { display: inline-block; transition: transform 0.15s; }
+  @keyframes beckon { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.6); opacity: 0; } }
+  .next-text {
+    display: flex; flex-direction: column; padding: 0.6rem 1rem; border-radius: 12px;
+    border: 1px dashed color-mix(in srgb, var(--accent) 50%, var(--border)); background: color-mix(in srgb, var(--accent) 5%, var(--bg));
+    transition: background 0.2s;
+  }
+  .next-btn:hover .next-text { background: color-mix(in srgb, var(--accent) 10%, var(--bg)); }
+  .next-text strong { color: var(--accent); }
+  .next-text span { color: var(--muted); font-size: 0.85rem; }
+  .next-btn:disabled { cursor: progress; }
+  .next-btn:disabled .next-ring { opacity: 0.5; }
+  .next-btn:disabled .next-ring::before { animation: none; opacity: 0; }
+
+  /* ---- Destinația ---- */
+  .finale { position: relative; padding: 5rem 0 2rem var(--gap); }
+  :global(.js) .finale:not(.is-on) { display: none; }
+  /* capătul firului: cârligul ajunge în gura peștelui */
+  .finale-dot {
+    position: absolute; left: var(--line-x); top: 2rem; transform: translate(-50%, -50%);
+    width: 6px; height: 6px; border-radius: 50%; background: #334155; z-index: 3;
+  }
+  .fish {
+    position: absolute; left: calc(var(--line-x) - 6px); top: calc(2rem - 27px); z-index: 2;
+    transform-origin: 6px 27px; animation: wiggle 1.2s ease-in-out infinite;
+    filter: drop-shadow(0 6px 8px rgba(37, 99, 235, 0.3));
+  }
+  :global(.finale.is-on) .fish { animation: bite 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both, wiggle 1.2s 0.7s ease-in-out infinite; }
+  @keyframes wiggle { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+  @keyframes bite { from { transform: translateY(40px) scale(0.5); opacity: 0; } to { transform: none; opacity: 1; } }
+  .finale-card {
+    position: relative; overflow: hidden;
+    border-radius: 20px; padding: 1.75rem; max-width: 36rem;
+    background: linear-gradient(160deg, #ffffff, #e0f2fe);
+    border: 1px solid #bae6fd;
+    box-shadow: 0 24px 50px -30px rgba(37, 99, 235, 0.6);
+  }
+  :global(.finale.is-on) .finale-card { animation: arrive 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  @keyframes arrive { from { opacity: 0; transform: translateY(30px) scale(0.94); } to { opacity: 1; transform: none; } }
+  .finale-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+  .finale-card h3 { font-size: 1.6rem; margin: 0.35rem 0 0.5rem; }
+  .finale-card p { margin: 0; }
+  .finale-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.25rem; position: relative; z-index: 1; }
+  .ghost { background: transparent; cursor: pointer; }
+
+  .ghost[hidden] { display: none; }
+
+  .confetti { position: absolute; inset: 0; pointer-events: none; }
+  :global(.confetti i) {
+    position: absolute; bottom: -14px; border-radius: 50%; opacity: 0;
+    border: 1.5px solid rgba(37, 99, 235, 0.45); background: rgba(255, 255, 255, 0.7);
+    animation: splash 2s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+  }
+  @keyframes splash {
+    0% { opacity: 0.9; transform: translate(0, 0); }
+    100% { opacity: 0; transform: translate(var(--dx), -280px); }
+  }
+
+  /* ---- Desktop: linie pe mijloc, carduri alternante ---- */
+  @media (min-width: 900px) {
+    .journey { --line-x: 50%; --gap: 3rem; }
+    .entry { width: 50%; }
+    .entry.is-left { padding: 0 var(--gap) 2.5rem 0; }
+    .entry.is-right { margin-left: 50%; padding: 0 0 2.5rem var(--gap); }
+    .entry.is-left .marker { left: 100%; }
+    .entry.is-right .marker { left: 0; }
+
+    .side-year {
+      display: block; position: absolute; top: 1.35rem;
+      font-weight: 700; color: var(--muted); font-size: 0.95rem; white-space: nowrap;
+      font-variant-numeric: tabular-nums; transition: opacity 0.6s 0.2s;
+    }
+    .entry.is-left .side-year { left: calc(100% + var(--gap)); }
+    .entry.is-right .side-year { right: calc(100% + var(--gap)); }
+
+    .card::after {
+      content: ""; position: absolute; top: 1.75rem; width: 12px; height: 12px;
+      background: var(--bg); border: 1px solid var(--border); transform: rotate(45deg);
+    }
+    .entry.is-left .card::after { right: -7px; border-left: none; border-bottom: none; }
+    .entry.is-right .card::after { left: -7px; border-right: none; border-top: none; }
+
+    :global(.js) .entry.is-left:not(.is-visible) .card { transform: translateX(-56px); }
+    :global(.js) .entry.is-right:not(.is-visible) .card { transform: translateX(56px); }
+
+    .endpoint { padding: 12.5rem 0 3rem calc(50% + 1.25rem); }
+    /* pe desktop barca stă în stânga firului */
+    .boat-btn { transform: none; }
+    .say { left: calc(var(--line-x) - 125px); }
+
+    .next-stop { padding: 0 0 2.5rem; display: flex; justify-content: center; }
+    .next-btn { flex-direction: column; gap: 0.6rem; padding-top: 4.4rem; text-align: center; }
+    .entry.is-left .card { margin-left: auto; }
+    .miss { position: absolute; top: 3.3rem; margin: 0; }
+    .entry.is-left .miss { left: calc(100% + var(--gap)); }
+    .entry.is-right .miss { right: calc(100% + var(--gap)); flex-direction: row-reverse; }
+    .entry.is-right .miss-fish-wrap { transform: scaleX(-1); }
+    .next-ring { top: 0; }
+
+    .finale { padding: 4rem 0 1rem; display: flex; justify-content: center; text-align: center; }
+    .finale { padding-top: 5.5rem; }
+    .finale-actions { justify-content: center; }
+  }
+
+  /* Evidențiere după tehnologie */
+  :global(.entry.is-dimmed) .card { opacity: 0.35; filter: grayscale(0.8); }
+  :global(.entry.is-match) .card { border-color: var(--accent); }
+
+  .card-head { display: flex; gap: 0.75rem; align-items: center; }
+  .head-text { display: flex; flex: 1; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; align-items: center; }
+  .logo { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+  .monogram { display: grid; place-items: center; font-weight: 800; font-size: 0.85rem; color: #fff; background: linear-gradient(135deg, var(--work), var(--certification)); }
+  .badge { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.15rem 0.55rem; border-radius: 999px; }
+  .badge--work { color: var(--work); background: color-mix(in srgb, var(--work) 12%, transparent); }
+  .badge--certification { color: var(--certification); background: color-mix(in srgb, var(--certification) 14%, transparent); }
+  .period { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+
+  .card h3 { margin: 0.75rem 0 0; font-size: 1.15rem; line-height: 1.3; }
+  .subtitle { margin: 0.15rem 0 0; font-weight: 600; color: #7c3aed; font-size: 0.92rem; }
+  .org { margin: 0.15rem 0 0.5rem; color: var(--muted); font-weight: 500; }
+  .slogan { margin: 0.6rem 0 0.75rem; padding-left: 0.8rem; border-left: 3px solid var(--accent); font-style: italic; font-weight: 600; font-size: 1.05rem; }
+  .summary { margin: 0; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; padding: 0; margin: 0.9rem 0 0; }
+  .tag {
+    font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 6px; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border);
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+  }
+  .tag:hover { border-color: var(--accent); }
+  :global(.tag.is-active) { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  details { margin-top: 0.9rem; border-top: 1px solid var(--border); padding-top: 0.6rem; }
+  summary { cursor: pointer; color: var(--accent); font-weight: 500; font-size: 0.9rem; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸"; display: inline-block; margin-right: 0.4rem; transition: transform 0.2s; }
+  details[open] summary::before { transform: rotate(90deg); }
+  summary .n { color: var(--muted); font-weight: 400; }
+  .highlights { margin: 0.6rem 0 0; padding-left: 1.1rem; }
+  .highlights li { margin-bottom: 0.4rem; }
+
+  @media (prefers-reduced-motion: reduce) { .runner, .next-ring { animation: none; } }
+</style>
+
+<script>
+  const journey = document.querySelector<HTMLElement>("[data-journey]");
+  const track = journey?.querySelector<HTMLElement>("[data-track]");
+
+  if (journey && track) {
+    const entries = [...track.querySelectorAll<HTMLElement>("[data-entry]")];
+    const total = entries.length;
+    const fill = track.querySelector<HTMLElement>("[data-line-fill]")!;
+    const lane = track.querySelector<HTMLElement>("[data-runner-lane]")!;
+    const hud = journey.querySelector<HTMLElement>("[data-hud]")!;
+    const hudN = hud.querySelector<HTMLElement>("[data-hud-n]")!;
+    const hudDots = [...hud.querySelectorAll<HTMLElement>(".hud-dot")];
+    const showAllBtn = hud.querySelector<HTMLButtonElement>("[data-show-all]")!;
+    const nextWrap = track.querySelector<HTMLElement>("[data-next-wrap]")!;
+    const nextBtn = track.querySelector<HTMLButtonElement>("[data-next]")!;
+    const nextTitle = track.querySelector<HTMLElement>("[data-next-title]")!;
+    const nextSub = track.querySelector<HTMLElement>("[data-next-sub]")!;
+    const finale = track.querySelector<HTMLElement>("[data-finale]")!;
+    const confetti = track.querySelector<HTMLElement>("[data-confetti]")!;
+    const replayBtn = track.querySelector<HTMLButtonElement>("[data-replay]")!;
+    const status = journey.querySelector<HTMLElement>("[data-skill-status]")!;
+    const statusName = status.querySelector<HTMLElement>("[data-skill-name]")!;
+    const statusCount = status.querySelector<HTMLElement>("[data-skill-count]")!;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, reduceMotion ? 0 : ms));
+
+    // reached = câte opriri sunt deblocate; total + 1 = destinația atinsă
+    let reached = 0;
+    let busy = false;
+    let activeSkill: string | null = null;
+
+    // ---- Linia: se umple până la ultima oprire atinsă ----
+    function anchorY(el: HTMLElement) {
+      const t = track!.getBoundingClientRect().top;
+      const r = el.getBoundingClientRect();
+      return r.top - t + r.height / 2;
+    }
+    function currentAnchor(): HTMLElement {
+      if (reached > total) return finale.querySelector(".finale-dot")!;
+      if (reached === 0) return track!.querySelector(".endpoint-dot")!;
+      return entries[reached - 1].querySelector(".marker")!;
+    }
+    // firul pleacă din vârful undiței (nu din marginea de sus a secțiunii)
+    const baseLine = track.querySelector<HTMLElement>(".line")!;
+    function syncLine() {
+      const top = anchorY(track!.querySelector(".endpoint-dot")!);
+      const y = anchorY(currentAnchor());
+      [fill, lane, baseLine].forEach((el) => (el.style.top = `${top}px`));
+      fill.style.height = `${y - top}px`;
+      lane.style.height = `${y - top}px`;
+      lane.style.setProperty("--h", `${y - top}px`);
+    }
+
+    function updateHud() {
+      hudN.textContent = String(Math.min(Math.max(reached, 1), total));
+      hudDots.forEach((d, i) => {
+        d.classList.toggle("done", i < reached);
+        d.classList.toggle("current", i === reached - 1 && reached <= total);
+      });
+      if (reached < total) {
+        const n = entries[reached];
+        nextTitle.textContent = reached === 0 ? "Cast the line" : "Drop the line deeper";
+        nextSub.textContent = `Next: ${n.dataset.year} · ${n.dataset.type === "certification" ? "a certification" : "a new role"}`;
+      } else {
+        nextTitle.textContent = "Reel in the catch";
+        nextSub.textContent = "Something's biting at the bottom…";
+      }
+      const missed = Math.min(reached, total);
+      const missEl = hud.querySelector<HTMLElement>("[data-hud-miss]")!;
+      missEl.hidden = missed === 0 || reached > total;
+      missEl.querySelector("[data-hud-miss-n]")!.textContent = String(missed);
+      const done = reached > total;
+      nextWrap.hidden = done;
+      showAllBtn.hidden = done;
+      replayBtn.hidden = !done;
+    }
+
+    // ---- Pescarul vorbește ----
+    const sayEl = track.querySelector<HTMLElement>("[data-say]")!;
+    const lines = [
+      "Argh, it got away! Click me to cast again 🎣",
+      "Just a nibble… going deeper!",
+      "So close! That one had IFS stripes.",
+      "Missed again — but I'm learning these waters.",
+      "Something big is down there…",
+      "One more cast — I can feel it!",
+    ];
+    function say(text: string) {
+      sayEl.textContent = text;
+      sayEl.classList.remove("pop");
+      void sayEl.offsetWidth;
+      sayEl.classList.add("pop");
+    }
+
+    async function advance(scroll = true) {
+      if (busy || reached > total) return;
+      busy = true;
+      nextBtn.disabled = true;
+
+      if (reached < total) {
+        const e = entries[reached];
+        e.classList.remove("is-locked");
+        reached++;
+        updateHud();
+        await new Promise(requestAnimationFrame);
+        syncLine();                         // linia coboară până la noua oprire
+        if (scroll) e.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+        await wait(650);
+        e.classList.add("is-reached");      // apare nodul
+        await wait(150);
+        e.classList.add("is-visible");      // apoi cardul, din partea lui
+        await wait(900);
+        say(lines[Math.min(reached - 1, lines.length - 1)]);  // peștele a scăpat
+      } else {
+        reached++;
+        finale.classList.add("is-on");
+        updateHud();
+        await new Promise(requestAnimationFrame);
+        syncLine();
+        if (scroll) finale.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+        await wait(600);
+        burst();
+        say("FISH ON!! 🎉 Reel it in!");
+        track!.classList.add("excited");
+        setTimeout(() => track!.classList.remove("excited"), 1600);
+      }
+      busy = false;
+      nextBtn.disabled = false;
+    }
+
+    function showAll() {
+      entries.forEach((e) => e.classList.remove("is-locked"));
+      entries.forEach((e) => e.classList.add("is-reached", "is-visible"));
+      reached = total + 1;
+      finale.classList.add("is-on");
+      updateHud();
+      say("Peeking at the whole lake, huh? 😄");
+      requestAnimationFrame(syncLine);
+    }
+
+    function reset() {
+      entries.forEach((e) => e.classList.add("is-locked"));
+      entries.forEach((e) => e.classList.remove("is-reached", "is-visible"));
+      finale.classList.remove("is-on");
+      reached = 0;
+      say("Click me to cast! 🎣");
+      activeSkill = null;
+      applySkill();
+      updateHud();
+      requestAnimationFrame(syncLine);
+    }
+
+    // Confetti la destinație
+    function burst() {
+      if (reduceMotion) return;
+      // bule care urcă — peștele a mușcat
+      confetti.replaceChildren();
+      for (let i = 0; i < 34; i++) {
+        const p = document.createElement("i");
+        const size = 6 + Math.random() * 14;
+        p.style.left = `${Math.random() * 100}%`;
+        p.style.width = p.style.height = `${size}px`;
+        p.style.setProperty("--dx", `${(Math.random() - 0.5) * 80}px`);
+        p.style.animationDelay = `${Math.random() * 0.6}s`;
+        confetti.appendChild(p);
+      }
+    }
+
+    // ---- Evidențiere după tehnologie (deblochează tot ca să poți compara) ----
+    function applySkill() {
+      let matches = 0;
+      for (const e of entries) {
+        const ok = !activeSkill || (e.dataset.tags ?? "").split("|").includes(activeSkill);
+        e.classList.toggle("is-dimmed", !!activeSkill && !ok);
+        e.classList.toggle("is-match", !!activeSkill && ok);
+        if (activeSkill && ok) matches++;
+      }
+      document.querySelectorAll<HTMLElement>("[data-skill]").forEach((el) => {
+        const on = el.dataset.skill === activeSkill;
+        el.classList.toggle("is-active", on);
+        el.setAttribute("aria-pressed", String(on));
+      });
+      if (activeSkill) {
+        const label = document.querySelector<HTMLElement>(`[data-skill="${CSS.escape(activeSkill)}"]`)?.dataset.skillLabel ?? activeSkill;
+        statusName.textContent = label;
+        statusCount.textContent = matches === 1 ? "1 stop" : `${matches} stops`;
+        status.hidden = false;
+      } else {
+        status.hidden = true;
+      }
+    }
+
+    document.addEventListener("click", (ev) => {
+      const el = (ev.target as HTMLElement).closest<HTMLElement>("[data-skill]");
+      if (!el) return;
+      const key = el.dataset.skill!;
+      activeSkill = activeSkill === key ? null : key;
+      if (activeSkill && reached <= total) showAll();
+      applySkill();
+      if (activeSkill && !journey.contains(el)) {
+        const first = entries.find((e) => e.classList.contains("is-match"));
+        (first ?? journey).scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+      }
+    });
+    status.querySelector("[data-clear-skill]")!.addEventListener("click", () => { activeSkill = null; applySkill(); });
+    document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && activeSkill) { activeSkill = null; applySkill(); } });
+
+    // ---- Pornire ----
+    hud.hidden = false;
+    nextWrap.hidden = false;
+    reset();
+    // ---- Un click aruncă undița: se smucește, mulineta se învârte, firul coboară ----
+    function cast() {
+      if (busy || reached > total) return;
+      track!.classList.remove("casting");
+      void track!.offsetWidth;
+      track!.classList.add("casting");
+      setTimeout(() => track!.classList.remove("casting"), 600);
+      advance();
+    }
+    nextBtn.addEventListener("click", cast);
+    track.querySelector("[data-boat]")!.addEventListener("click", cast);
+
+    // peștii fug când treci pe lângă ei
+    track.querySelectorAll<HTMLElement>("[data-swimmer]").forEach((f) => {
+      f.addEventListener("pointerenter", () => {
+        f.classList.add("scared");
+        setTimeout(() => f.classList.remove("scared"), 1400);
+      });
+    });
+    showAllBtn.addEventListener("click", showAll);
+    replayBtn.addEventListener("click", () => {
+      reset();
+      journey.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    });
+
+    // Prima oprire se deschide singură când secțiunea intră pe ecran
+    // (sau imediat, dacă vii din butonul „Start the journey” de sus)
+    const io = new IntersectionObserver(([en]) => {
+      if (en.isIntersecting && reached === 0) { advance(false); io.disconnect(); }
+    }, { threshold: 0.35 });
+    io.observe(track);
+
+    // Linia se recalculează când se schimbă înălțimea (detalii deschise, resize)
+    new ResizeObserver(syncLine).observe(track);
+  }
+</script>

@@ -1,0 +1,67 @@
+---
+// Notă de confidențialitate (GDPR, art. 13). Site static: fără cookies, fără tracking, fără formulare.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { profile } from "../data/cv";
+const updated = "9 November 2026";
+---
+
+<BaseLayout title={`Privacy notice — ${profile.name}`} description="How this portfolio site handles personal data.">
+  <article class="container privacy">
+    <p class="eyebrow">Privacy notice</p>
+    <h1>Your privacy on this site</h1>
+    <p class="updated">Last updated: {updated}</p>
+
+    <p class="tldr">
+      <strong>In short:</strong> this is a static portfolio. It sets <strong>no cookies</strong>, uses <strong>no analytics or tracking</strong>,
+      loads <strong>no third-party scripts or fonts</strong> and has <strong>no forms</strong>. I don't collect any personal data about you.
+    </p>
+
+    <h2>Who is responsible</h2>
+    <p>
+      {profile.name}, {profile.location}. Contact:
+      <a href="/#contact" data-mail data-mail-text data-u={profile.emailUser} data-d={profile.emailDomain}>email me</a>.
+    </p>
+
+    <h2>Cookies and local storage</h2>
+    <p>
+      This site does not set cookies and does not store anything in your browser (no localStorage, no session storage).
+      That's why there is no cookie banner — there is nothing to consent to.
+    </p>
+
+    <h2>Hosting (GitHub Pages)</h2>
+    <p>
+      The site is hosted on GitHub Pages, operated by GitHub, Inc. When you open a page, your browser connects to GitHub's servers,
+      which may process technical data such as your IP address, browser type and the time of the request, in order to deliver the
+      site and keep it secure. I have no access to this data. The legal basis is legitimate interest in providing a secure website
+      (Art. 6(1)(f) GDPR). For details, including international data transfers, see the
+      <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub General Privacy Statement</a>.
+    </p>
+
+    <h2>If you email me</h2>
+    <p>
+      If you contact me by email, I use your email address and message only to reply to you (Art. 6(1)(b) and (f) GDPR).
+      I keep the conversation only as long as needed for that purpose and don't share it with anyone.
+    </p>
+
+    <h2>Your rights</h2>
+    <p>
+      Under the GDPR you have the right to access, correct or delete your personal data, to restrict or object to its processing
+      and to data portability. To exercise them, just email me. You also have the right to lodge a complaint with a supervisory
+      authority — in Romania, the
+      <a href="https://www.dataprotection.ro" target="_blank" rel="noopener noreferrer">National Supervisory Authority for Personal Data Processing (ANSPDCP)</a>.
+    </p>
+
+    <p class="back"><a href="/">← Back to the portfolio</a></p>
+  </article>
+</BaseLayout>
+
+<style>
+  .privacy { max-width: 760px; padding-top: 3rem; padding-bottom: 4rem; }
+  .eyebrow { margin: 0; color: var(--accent); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  h1 { margin: 0.3rem 0 0.25rem; font-size: clamp(1.8rem, 5vw, 2.4rem); }
+  .updated { margin: 0 0 1.5rem; color: var(--muted); font-size: 0.9rem; }
+  .tldr { padding: 1rem 1.2rem; border-radius: 14px; background: #eff6ff; border: 1px solid #bfdbfe; }
+  h2 { margin: 2rem 0 0.4rem; font-size: 1.2rem; }
+  p { margin: 0 0 0.75rem; }
+  .back { margin-top: 2.5rem; }
+</style>

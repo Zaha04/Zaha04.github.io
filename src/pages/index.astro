@@ -1,0 +1,42 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import Timeline from "../components/Timeline.astro";
+import Education from "../components/Education.astro";
+import Skills from "../components/Skills.astro";
+import Section from "../components/Section.astro";
+import { profile } from "../data/cv";
+---
+
+<BaseLayout title={`${profile.name} — Data Engineer`} description={profile.title}>
+  <Hero />
+  <Timeline />
+  <Education />
+  <Skills />
+
+  <Section id="contact" title="Contact">
+    <p class="lead">I'm open to new opportunities as:</p>
+    <ul class="open-to">
+      {profile.openTo.map((r) => <li>{r}</li>)}
+    </ul>
+    <p class="lead">The fastest way to reach me is email.</p>
+    <div class="contact">
+      <a class="btn primary" href="#contact" data-mail data-mail-text data-u={profile.emailUser} data-d={profile.emailDomain}>✉ Email me</a>
+      <a class="btn" href={profile.linkedin} target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a class="btn" href={profile.cv} download>⬇ Download CV (PDF)</a>
+      <span class="loc">📍 {profile.location}</span>
+    </div>
+    <p class="langs">🗣 {profile.languages.map((l) => `${l.name} (${l.level.toLowerCase()})`).join(" · ")}</p>
+  </Section>
+</BaseLayout>
+
+<style>
+  .contact { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 1.25rem; }
+  .loc { color: var(--muted); }
+  .langs { color: var(--muted); margin: 1rem 0 0; }
+  .open-to { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; margin: 0 0 1.25rem; }
+  .open-to li {
+    padding: 0.45rem 0.95rem; border-radius: 999px; font-weight: 600; font-size: 0.95rem;
+    background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af;
+  }
+</style>
