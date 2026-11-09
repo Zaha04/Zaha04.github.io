@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://zaha04.github.io',
   security: {
     // Content Security Policy: Astro adaugă un <meta> cu amprentele (hash) ale scripturilor
     // și stilurilor proprii → browserul refuză orice cod injectat care nu vine din site.
